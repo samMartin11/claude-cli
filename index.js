@@ -13,8 +13,7 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-const question = (prompt) =>
-  new Promise((resolve) => rl.question(prompt, resolve));
+const question = (prompt) => new Promise((resolve) => rl.question(prompt, resolve));
 
 let apiKey = process.env.ANTHROPIC_API_KEY;
 let conversationHistory = [];
@@ -31,7 +30,9 @@ program
 
 const options = program.opts();
 
-if (options.key) apiKey = options.key;
+if (options.key) {
+  apiKey = options.key;
+}
 
 if (!apiKey) {
   console.log(chalk.red("❌ Error: API key not provided"));
@@ -41,7 +42,9 @@ if (!apiKey) {
   process.exit(1);
 }
 
-if (options.model) currentModel = options.model;
+if (options.model) {
+  currentModel = options.model;
+}
 
 if (options.load) {
   try {
@@ -76,17 +79,49 @@ function showBanner() {
   console.log(chalk.hex("#9C27B0").bold("                    ╚═════╝╚══════╝╚═╝               "));
   console.log("");
   console.log(chalk.hex("#FF6B6B").bold("  ╔════════════════════════════════════════════════╗"));
-  console.log(chalk.hex("#FF8E53").bold("  ║") + chalk.hex("#FFFFFF").bold("      🚀 Welcome to Claude CLI — Your AI Terminal   ") + chalk.hex("#FF8E53").bold("║"));
-  console.log(chalk.hex("#FFC107").bold("  ║") + chalk.hex("#AAAAAA")("        Powered by Anthropic Claude API             ") + chalk.hex("#FFC107").bold("║"));
+  console.log(
+    chalk.hex("#FF8E53").bold("  ║") +
+      chalk.hex("#FFFFFF").bold("      🚀 Welcome to Claude CLI — Your AI Terminal   ") +
+      chalk.hex("#FF8E53").bold("║")
+  );
+  console.log(
+    chalk.hex("#FFC107").bold("  ║") +
+      chalk.hex("#AAAAAA")("        Powered by Anthropic Claude API             ") +
+      chalk.hex("#FFC107").bold("║")
+  );
   console.log(chalk.hex("#4CAF50").bold("  ╚════════════════════════════════════════════════╝"));
   console.log("");
-  console.log(chalk.hex("#FF6B6B")("  👤 ") + chalk.white.bold("User   : ") + chalk.hex("#FFC107").bold(os.userInfo().username));
-  console.log(chalk.hex("#4CAF50")("  🤖 ") + chalk.white.bold("Model  : ") + chalk.hex("#2196F3").bold(currentModel));
-  console.log(chalk.hex("#9C27B0")("  🔑 ") + chalk.white.bold("Key    : ") + chalk.hex("#FF8E53").bold(apiKey.slice(0, 10) + "..."));
-  console.log(chalk.hex("#2196F3")("  💻 ") + chalk.white.bold("System : ") + chalk.hex("#4CAF50").bold(`${os.platform()} (${os.arch()})`));
+  console.log(
+    chalk.hex("#FF6B6B")("  👤 ") +
+      chalk.white.bold("User   : ") +
+      chalk.hex("#FFC107").bold(os.userInfo().username)
+  );
+  console.log(
+    chalk.hex("#4CAF50")("  🤖 ") +
+      chalk.white.bold("Model  : ") +
+      chalk.hex("#2196F3").bold(currentModel)
+  );
+  console.log(
+    chalk.hex("#9C27B0")("  🔑 ") +
+      chalk.white.bold("Key    : ") +
+      chalk.hex("#FF8E53").bold(apiKey.slice(0, 10) + "...")
+  );
+  console.log(
+    chalk.hex("#2196F3")("  💻 ") +
+      chalk.white.bold("System : ") +
+      chalk.hex("#4CAF50").bold(`${os.platform()} (${os.arch()})`)
+  );
   console.log("");
   console.log(chalk.hex("#FF6B6B").bold("  ┌─────────────────────────────────────────────┐"));
-  console.log(chalk.hex("#FF6B6B").bold("  │") + chalk.hex("#FFC107")("  💡 Type ") + chalk.hex("#FFFFFF").bold("/help") + chalk.hex("#FFC107")(" for commands, ") + chalk.hex("#FFFFFF").bold("/quit") + chalk.hex("#FFC107")(" to exit       ") + chalk.hex("#FF6B6B").bold("│"));
+  console.log(
+    chalk.hex("#FF6B6B").bold("  │") +
+      chalk.hex("#FFC107")("  💡 Type ") +
+      chalk.hex("#FFFFFF").bold("/help") +
+      chalk.hex("#FFC107")(" for commands, ") +
+      chalk.hex("#FFFFFF").bold("/quit") +
+      chalk.hex("#FFC107")(" to exit       ") +
+      chalk.hex("#FF6B6B").bold("│")
+  );
   console.log(chalk.hex("#FF6B6B").bold("  └─────────────────────────────────────────────┘"));
   console.log("");
 }
@@ -181,10 +216,7 @@ async function chat(userMessage) {
     });
 
     for await (const chunk of stream) {
-      if (
-        chunk.type === "content_block_delta" &&
-        chunk.delta.type === "text_delta"
-      ) {
+      if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
         process.stdout.write(chunk.delta.text);
         fullResponse += chunk.delta.text;
       }
@@ -195,14 +227,32 @@ async function chat(userMessage) {
     totalOutputTokens += finalMessage.usage.output_tokens;
 
     console.log(
-      chalk.gray(
-        ` [↑${finalMessage.usage.input_tokens} ↓${finalMessage.usage.output_tokens}]\n`
-      )
+      chalk.gray(` [↑${finalMessage.usage.input_tokens} ↓${finalMessage.usage.output_tokens}]\n`)
     );
 
     conversationHistory.push({ role: "assistant", content: fullResponse });
   } catch (error) {
-    console.error(chalk.red("\n❌ Error:"), error.message, "\n");
+    conversationHistory.pop();
+    messageCount--;
+
+    console.error(chalk.red("\n❌ Error:"));
+
+    if (error.status === 401) {
+      console.error(chalk.yellow("Invalid API key. Check ANTHROPIC_API_KEY."));
+    } else if (error.status === 429) {
+      console.error(chalk.yellow("Rate limit exceeded. Please wait before retrying."));
+    } else if (error.status === 400) {
+      console.error(chalk.yellow(`Invalid request: ${error.message}`));
+    } else if (error.status === 404) {
+      console.error(chalk.yellow(`Model not found: ${currentModel}`));
+    } else if (error.code === "ECONNREFUSED" || error.code === "ENOTFOUND") {
+      console.error(chalk.yellow("Network error. Check your internet connection."));
+    } else if (error.name === "AbortError") {
+      console.error(chalk.yellow("Request timed out. Please try again."));
+    } else {
+      console.error(chalk.yellow(error.message || "Unknown error occurred"));
+    }
+    console.log("");
   }
 }
 
@@ -213,7 +263,9 @@ async function main() {
     const userInput = await question(chalk.hex("#FFC107").bold("You: "));
     const trimmed = userInput.trim();
 
-    if (!trimmed) continue;
+    if (!trimmed) {
+      continue;
+    }
 
     if (trimmed === "/quit") {
       console.log(chalk.hex("#FF6B6B").bold("\n👋 Goodbye! See you next time.\n"));
@@ -230,12 +282,18 @@ async function main() {
       continue;
     }
 
-    if (trimmed === "/usage") { showUsage(); continue; }
+    if (trimmed === "/usage") {
+      showUsage();
+      continue;
+    }
     if (trimmed === "/history") {
       console.log(chalk.yellow(`\n📝 Messages in history: ${conversationHistory.length}\n`));
       continue;
     }
-    if (trimmed === "/help") { showHelp(); continue; }
+    if (trimmed === "/help") {
+      showHelp();
+      continue;
+    }
 
     if (trimmed.startsWith("/export")) {
       const parts = trimmed.split(" ");
