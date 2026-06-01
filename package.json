@@ -1,11 +1,24 @@
 {
-  "name": "claude-cli",
-  "version": "1.0.0",
+  "name": "claudeline",
+  "version": "1.0.1",
   "description": "Claude.ai in your Terminal",
   "main": "index.js",
   "bin": {
     "claude-cli": "./index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samMartin11/claude-cli.git"
+  },
+  "keywords": [
+    "claude",
+    "ai",
+    "cli",
+    "terminal",
+    "anthropic"
+  ],
+  "author": "Sougata Saha",
+  "license": "MIT",
   "scripts": {
     "start": "node index.js",
     "lint": "eslint index.js",
