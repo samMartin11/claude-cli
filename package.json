@@ -1,11 +1,9 @@
 {
-  "name": "claudeline",
+  "name": "claude-teminal",
   "version": "1.0.1",
   "description": "Claude.ai in your Terminal",
   "main": "index.js",
-  "bin": {
-    "claude-cli": "./index.js"
-  },
+  "bin": "./index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/samMartin11/claude-cli.git"
