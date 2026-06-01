@@ -1,25 +1,29 @@
-# Claude CLI
+# Claude Terminal (ClaudeLine)
 
 A terminal-based interface to interact with Claude AI using the Anthropic API.
 
 ## Installation
 
-### Via npm (global)
+### Via npm (recommended)
+
+Install globally from NPM:
 
 ```bash
-npm install -g .
+npm install -g claude-teminal
 ```
 
 Then run from anywhere:
 
 ```bash
-claude-cli
+claude-teminal
 ```
 
 ### From source
 
+Clone and install locally:
+
 ```bash
-git clone <repo-url>
+git clone https://github.com/samMartin11/claude-cli.git
 cd claude-cli
 npm install
 npm start
@@ -38,7 +42,7 @@ export ANTHROPIC_API_KEY='your-api-key-here'
 Or pass it directly via the `--key` flag:
 
 ```bash
-claude-cli --key 'your-api-key-here'
+claude-teminal --key 'your-api-key-here'
 ```
 
 ## Usage
@@ -46,7 +50,7 @@ claude-cli --key 'your-api-key-here'
 Start the CLI:
 
 ```bash
-claude-cli
+claude-teminal
 ```
 
 ### Options
@@ -73,16 +77,16 @@ Type any message to chat with Claude. Or use these commands:
 
 ```bash
 # Start with default model
-claude-cli
+claude-teminal
 
 # Use a specific model
-claude-cli --model claude-sonnet-4-6
+claude-teminal --model claude-sonnet-4-6
 
 # Load a previous conversation
-claude-cli --load ~/Downloads/claude-export-2026-06-02T12-30-45-123Z.json
+claude-teminal --load ~/Downloads/claude-export-2026-06-02T12-30-45-123Z.json
 
 # Pass API key directly
-claude-cli --key sk-ant-xxxxx
+claude-teminal --key sk-ant-xxxxx
 ```
 
 ## Exported Conversations
